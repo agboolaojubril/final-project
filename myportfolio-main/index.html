@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agboola Jubril | Junior Cloud Engineer Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #05050a;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --border-glow: rgba(56, 189, 248, 0.2);
+            --primary: #38bdf8;
+            --secondary: #a855f7;
+            --accent: #facc15;
+            --success: #22c55e;
+            --text-main: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Dynamic Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            z-index: -2;
+        }
+
+        /* Animated Grid Overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: top;
+            animation: gridMove 20s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        /* Neon Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        /* Navigation Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 10, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glow);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Hero Section */
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--primary);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        header h1 span.name-gradient {
+            background: linear-gradient(90deg, #facc15, #ff7e5f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header h2 {
+            font-size: 2rem;
+            margin: 20px 0;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        header p {
+            max-width: 750px;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #94a3b8;
+        }
+
+        .btn-group {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-primary {
+            padding: 15px 35px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #000;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+            transition: 0.4s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            padding: 15px 35px;
+            background: transparent;
+            color: var(--text-main);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 12px;
+            border: 1px solid var(--border-glow);
+            transition: 0.4s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+        }
+
+        /* Glassmorphic Sections Layout */
+        section {
+            padding: 100px 10%;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 40px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(56, 189, 248, 0.1);
+        }
+
+        /* Grid Frameworks */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+        }
+
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .metric-box {
+            background: rgba(5, 5, 10, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .metric-box h3 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+        }
+
+        .metric-box p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Tech Cluster Stack */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .skill-group h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .skill-bar-wrapper {
+            margin-bottom: 18px;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .skill-progress {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Projects Section - Terminal Concept */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 35px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-r { background: #ef4444; }
+        .dot-y { background: #eab308; }
+        .dot-g { background: #22c55e; }
+
+        .project-card h3 {
+            color: var(--text-main);
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+        }
+
+        .project-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #d8b4fe;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Career Journey Timeline */
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(var(--primary), var(--secondary));
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 60px;
+            margin-bottom: 50px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 5px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg-dark);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .timeline-content h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content span {
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .timeline-content p {
+            color: #94a3b8;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .contact-container p {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .info-strip {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .info-item {
+            font-size: 1.1rem;
+        }
+
+        .info-item strong {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-glow);
+            padding: 40px 10%;
+            text-align: center;
+            background: #020205;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        footer span {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Responsive Configuration */
+        @media (max-width: 1024px) {
+            header h1 { font-size: 4rem; }
+            .about-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 3rem; }
+            header h2 { font-size: 1.4rem; }
+            nav { padding: 15px 5%; }
+            .nav-links { display: none; } /* Focus on single clean page layout for mobile */
+            .info-strip { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-overlay"></div>
+
+    <nav>
+        <div class="logo">Jubril Cloud World</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Connect</a>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero-badge">System Status: Fully Operational</div>
+        <h1>Agboola <span class="name-gradient">Jubril</span></h1>
+        <h2>Junior Cloud Engineer & Linux Architect</h2>
+        <p>
+            Deploying highly available, modern infrastructure paradigms inside <strong>Jubril Cloud World</strong>. Specializing in cloud migrations, Linux core configuration, and modern CI/CD operations frameworks.
+        </p>
+        <div class="btn-group">
+            <a href="#projects" class="btn-primary">View Infrastructure</a>
+            <a href="#contact" class="btn-secondary">Initiate Contact</a>
+        </div>
+    </header>
+
+    <section id="about">
+        <h2 class="section-title">System Overview</h2>
+        <div class="about-grid">
+            <div class="glass-card">
+                <p style="font-size: 1.2rem; line-height: 1.9; color: #cbd5e1;">
+                    I am Agboola Jubril, an execution-driven Junior Cloud Engineer based out of Lagos, Nigeria. I bridge the gap between development workflows and robust production-ready runtime structures. My methodology values high availability, iron-clad access security, and automation scripts that turn complex configurations into single-command executions.
+                </p>
+            </div>
+            <div class="metrics-panel">
+                <div class="metric-box">
+                    <h3>10+</h3>
+                    <p>Live Sandbox Clusters</p>
+                </div>
+                <div class="metric-box">
+                    <h3>20+</h3>
+                    <p>Linux Tasks Mastered</p>
+                </div>
+                <div class="metric-box">
+                    <h3>15+</h3>
+                    <p>Network Policies Tested</p>
+                </div>
+                <div class="metric-box">
+                    <h3>100%</h3>
+                    <p>Uptime Devotion</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills">
+        <h2 class="section-title">Technical Matrix</h2>
+        <div class="glass-card skills-grid">
+            
+            <div class="skill-group">
+                <h3>☁️ Cloud Ecosystems</h3>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>AWS Core Platforms (EC2, S3, IAM)</span><span>75%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 75%;"></div></div>
+                </div>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>Infrastructure As Code (Concepts)</span><span>60%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 60%;"></div></div>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>🐧 Kernel & Automation</h3>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>Linux Administration & ACL Architecture</span><span>85%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 85%;"></div></div>
+                </div>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>Shell Scripting & Workflows</span><span>70%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 70%;"></div></div>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>🌐 Routing & Containerization</h3>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>Networking (VPC, Subnets, DNS, TCP/IP)</span><span>80%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 80%;"></div></div>
+                </div>
+                <div class="skill-bar-wrapper">
+                    <div class="skill-info"><span>Docker Containers & Microservices</span><span>65%</span></div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 65%;"></div></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2 class="section-title">Deployment Repository</h2>
+        <div class="projects-grid">
+            
+            <div class="glass-card project-card">
+                <div>
+                    <div class="terminal-header">
+                        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+                    </div>
+                    <h3>Linux Production Lab Environment</h3>
+                    <p>Designed and provisioned isolated Linux servers implementing detailed hierarchical structures using Access Control Lists (ACLs), user management controls, and secure custom bash keys.</p>
+                </div>
+                <div class="tech-tags">
+                    <span class="tag">RHEL/Ubuntu</span>
+                    <span class="tag">ACL Security</span>
+                    <span class="tag">Bash</span>
+                </div>
+            </div>
+
+            <div class="glass-card project-card">
+                <div>
+                    <div class="terminal-header">
+                        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+                    </div>
+                    <h3>AWS Hybrid Architecture Practice</h3>
+                    <p>Engineered fault-tolerant setups containing custom multi-subnet VPCs, precise security groups, and cloud storage elements ensuring high resilience against failures.</p>
+                </div>
+                <div class="tech-tags">
+                    <span class="tag">AWS IAM</span>
+                    <span class="tag">VPC Routing</span>
+                    <span class="tag">EC2/S3</span>
+                </div>
+            </div>
+
+            <div class="glass-card project-card">
+                <div>
+                    <div class="terminal-header">
+                        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+                    </div>
+                    <h3>GitOps Automation Framework</h3>
+                    <p>Developed responsive configuration tracking systems leveraging advanced version control paradigms to log changes across multi-layered web infrastructure projects cleanly.</p>
+                </div>
+                <div class="tech-tags">
+                    <span class="tag">Git Automation</span>
+                    <span class="tag">CI/CD Ideas</span>
+                    <span class="tag">Frontend</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">Pipeline Strategy</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span>Phase 01</span>
+                    <h3>Core Infrastructure Engineering</h3>
+                    <p>Deep foundational testing around virtualization layers, Linux configurations, and routing protocols within standard local testbeds.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span>Phase 02</span>
+                    <h3>Cloud Scaling & Multi-Tenant Security</h3>
+                    <p>Transitioned system processes to AWS using least-privileged architectures via IAM matrices, optimizing object storage arrays and network routes.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span>Phase 03</span>
+                    <h3>Immutable Architectures (Future Node)</h3>
+                    <p>Moving targets towards deep automation configurations using Kubernetes clustering systems, declarative YAML scripting patterns, and automated delivery steps.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="glass-card contact-container">
+            <h2 style="font-family: 'Syne', sans-serif; font-size: 2.5rem; margin-bottom: 20px;">Let's Connect Clusters</h2>
+            <p>I am looking to join an innovative cloud engineering team to help automate high-availability systems. Let's start a channel.</p>
+            <div class="info-strip">
+                <div class="info-item">📧 Email: <strong>agboola.o.jubril@gmail.com</strong></div>
+                <div class="info-item">📱 Call Sign: <strong>+2347044889103</strong></div>
+                <div class="info-item">📍 Availability: <strong>Lagos, Nigeria (Remote/Hybrid)</strong></div>
+            </div>
+            <a href="#" class="btn-primary" style="display: inline-block;">Download Cloud Engineer CV</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 <span>Jubril Cloud World</span>. Infrastructure maintained by Agboola Jubril. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

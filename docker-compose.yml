@@ -1,0 +1,11 @@
+services:
+
+  portfolio:
+    build: ./myportfolio-main
+    ports:
+      - "80:80"
+
+  java-app:
+    build: ./project-java-app
+    ports:
+      - "8080:8080"

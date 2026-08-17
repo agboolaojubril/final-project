@@ -1,0 +1,283 @@
+# ============================================================
+# OS / SYSTEM FILES
+# ============================================================
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+
+
+# ============================================================
+# IDE / EDITOR FILES
+# ============================================================
+
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code workspace files
+*.code-workspace
+
+
+# ============================================================
+# JAVA / MAVEN
+# ============================================================
+
+# Maven build output
+target/
+
+# Java compiled files
+*.class
+
+# Maven logs
+*.log
+
+# Maven temporary files
+.releaseBackup
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+
+# ============================================================
+# GRADLE
+# ============================================================
+
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle cache
+.gradle/
+
+
+# ============================================================
+# TERRAFORM
+# ============================================================
+
+# Terraform working directory
+.terraform/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform variable files
+*.tfvars
+*.tfvars.json
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+# NOTE:
+# Do NOT ignore *.tf files.
+# Do NOT ignore .terraform.lock.hcl
+# The Terraform lock file should normally be committed.
+
+
+# ============================================================
+# ANSIBLE
+# ============================================================
+
+# Ansible retry files
+*.retry
+
+# Ansible vault files
+.vault_pass
+vault_password_file
+
+# Local Ansible variables
+group_vars/*/vault.yml
+host_vars/*/vault.yml
+
+
+# ============================================================
+# DOCKER
+# ============================================================
+
+# Docker override files
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Docker environment files
+.env
+.env.*
+!.env.example
+
+# Docker logs
+*.log
+
+
+# ============================================================
+# ENVIRONMENT / SECRETS
+# ============================================================
+
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Secret files
+*.secret
+*.secrets
+secrets/
+credentials/
+private/
+
+# Certificates / private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+
+# ============================================================
+# NODE.JS / JAVASCRIPT
+# ============================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.npm/
+.yarn/
+.pnpm-store/
+
+dist/
+coverage/
+
+
+# ============================================================
+# PYTHON
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+ENV/
+
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+*.egg-info/
+
+
+# ============================================================
+# JENKINS
+# ============================================================
+
+# Jenkins temporary files
+jenkins_home/
+jenkins-data/
+
+# Jenkins secrets / credentials
+secrets.xml
+credentials.xml
+
+
+# ============================================================
+# SONARQUBE
+# ============================================================
+
+.sonar/
+.scannerwork/
+
+
+# ============================================================
+# APPLICATION LOGS
+# ============================================================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+server.log
+
+
+# ============================================================
+# DATABASE FILES
+# ============================================================
+
+*.db
+*.sqlite
+*.sqlite3
+
+
+# ============================================================
+# BACKUP FILES
+# ============================================================
+
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+
+# ============================================================
+# BUILD / TEMPORARY FILES
+# ============================================================
+
+tmp/
+temp/
+.cache/
+.cache-loader/
+
+
+# ============================================================
+# COVERAGE / TEST RESULTS
+# ============================================================
+
+coverage/
+test-results/
+reports/
+
+
+# ============================================================
+# LOCAL CONFIGURATION
+# ============================================================
+
+local/
+.local/
+*.local
+
+
+# ============================================================
+# GENERATED FILES
+# ============================================================
+
+generated/
+out/
+
+
+# ============================================================
+# KEEP IMPORTANT EXAMPLE FILES
+# ============================================================
+
+!.env.example
+!README.md
