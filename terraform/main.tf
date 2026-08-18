@@ -19,6 +19,7 @@ vpc_id = aws_vpc.demotf_vpc.id
 resource "aws_subnet" "demotf_subnet" {
 cidr_block = "10.0.1.0/24"
 vpc_id     = aws_vpc.demotf_vpc.id
+availability_zone  = "us-east-1a"
 }
 resource "aws_route_table" "demotf_route_table" {
 vpc_id = aws_vpc.demotf_vpc.id
@@ -63,8 +64,8 @@ variable "instance_keypair" {
   sensitive = true
 }
 resource "aws_instance" "demo_instance" {
-ami           = "ami-0bdc7d025135d7b49"
-instance_type = "c7i-flex.large"
+ami           = "ami-0b6d9d3d33ba97d99"
+instance_type = "m7i-flex.large"
 subnet_id     = aws_subnet.demotf_subnet.id
 key_name = var.instance_keypair
 vpc_security_group_ids = [aws_security_group.demotf_security_group.id]

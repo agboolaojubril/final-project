@@ -1,0 +1,84 @@
+name: Deploy Applications to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Copy the project to EC2
+      - name: Copy project to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "."
+          target: "~/final-project"
+
+      # 3. Install Docker and Docker Compose on EC2
+      - name: Install Docker and Docker Compose
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            set -e
+
+            if ! command -v docker >/dev/null 2>&1; then
+              if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update
+                sudo apt-get install -y docker.io docker-compose-plugin
+              elif command -v yum >/dev/null 2>&1; then
+                sudo yum update -y
+                sudo yum install -y docker
+              else
+                echo "Unsupported EC2 operating system: no apt-get or yum found"
+                exit 1
+              fi
+            fi
+
+            if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+              if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update
+                sudo apt-get install -y docker-compose-plugin
+              elif command -v yum >/dev/null 2>&1; then
+                sudo yum install -y docker-compose-plugin || sudo yum install -y docker-compose
+              fi
+            fi
+
+            sudo systemctl enable --now docker
+
+            if ! command -v docker-compose >/dev/null 2>&1; then
+              sudo tee /usr/local/bin/docker-compose >/dev/null <<'EOF'
+#!/bin/sh
+exec docker compose "$@"
+EOF
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+      # 4. Build and deploy both containers on EC2
+      - name: Build and deploy applications
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd ~/final-project
+            docker-compose up -d --build
