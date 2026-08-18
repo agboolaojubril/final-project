@@ -40,32 +40,15 @@ jobs:
             set -e
 
             if ! command -v docker >/dev/null 2>&1; then
-              if command -v apt-get >/dev/null 2>&1; then
-                sudo apt-get update
-                sudo apt-get install -y docker.io docker-compose-plugin
-              elif command -v yum >/dev/null 2>&1; then
-                sudo yum update -y
-                sudo yum install -y docker
-              else
-                echo "Unsupported EC2 operating system: no apt-get or yum found"
-                exit 1
-              fi
-            fi
-
-            if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
-              if command -v apt-get >/dev/null 2>&1; then
-                sudo apt-get update
-                sudo apt-get install -y docker-compose-plugin
-              elif command -v yum >/dev/null 2>&1; then
-                sudo yum install -y docker-compose-plugin || sudo yum install -y docker-compose
-              fi
+              echo "Docker is not installed. Installing from Docker's official repository..."
+              sudo sh ~/final-project/get-docker.sh
             fi
 
             sudo systemctl enable --now docker
 
-            if ! command -v docker-compose >/dev/null 2>&1; then
-              printf '%s\n' '#!/bin/sh' 'exec docker compose "$@"' | sudo tee /usr/local/bin/docker-compose >/dev/null
-              sudo chmod +x /usr/local/bin/docker-compose
+            if ! docker compose version >/dev/null 2>&1; then
+              echo "Docker Compose is unavailable. Install Docker Compose on the EC2 host or restore outbound access to download.docker.com."
+              exit 1
             fi
 
       # 4. Build and deploy both containers on EC2
@@ -78,4 +61,4 @@ jobs:
 
           script: |
             cd ~/final-project
-            docker-compose up -d --build
+            docker compose up -d --build
