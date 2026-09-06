@@ -16,7 +16,7 @@ jobs:
 
       # 1. Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # 2. Copy the project to EC2
       - name: Copy project to EC2
