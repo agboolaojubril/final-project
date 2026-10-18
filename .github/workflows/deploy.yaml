@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       # 1. Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v6
@@ -29,37 +28,73 @@ jobs:
           source: "."
           target: "~/final-project"
 
-      # 3. Install Docker and Docker Compose on EC2
-      - name: Install Docker and Docker Compose
+      # 3. Install Docker and Docker Compose, then deploy
+      - name: Install Docker and Docker Compose and deploy
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-
+          port: 22
+          command_timeout: 30m
           script: |
             set -e
 
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "Docker is not installed. Installing from Docker's official repository..."
-              sudo sh ~/final-project/get-docker.sh
-            fi
+            echo "Detecting Amazon Linux version..."
+            source /etc/os-release
+            echo "OS: $PRETTY_NAME"
 
-            sudo systemctl enable --now docker
-
-            if ! docker compose version >/dev/null 2>&1; then
-              echo "Docker Compose is unavailable. Install Docker Compose on the EC2 host or restore outbound access to download.docker.com."
+            echo "Installing Docker..."
+            if [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2023" ]; then
+              sudo dnf install -y docker
+            elif [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2" ]; then
+              sudo yum install -y docker
+            else
+              echo "Unsupported OS: $ID $VERSION_ID"
               exit 1
             fi
 
-      # 4. Build and deploy both containers on EC2
-      - name: Build and deploy applications
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+            echo "Starting Docker..."
+            sudo systemctl enable --now docker
 
-          script: |
+            echo "Checking Docker Compose..."
+            if ! sudo docker compose version >/dev/null 2>&1; then
+              if [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2023" ]; then
+                sudo dnf install -y docker-compose-plugin || true
+              fi
+            fi
+
+            if ! sudo docker compose version >/dev/null 2>&1; then
+              echo "Installing Docker Compose CLI plugin..."
+              ARCH=$(uname -m)
+
+              case "$ARCH" in
+                x86_64) COMPOSE_ARCH=x86_64 ;;
+                aarch64) COMPOSE_ARCH=aarch64 ;;
+                *)
+                  echo "Unsupported architecture: $ARCH"
+                  exit 1
+                  ;;
+              esac
+
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins
+
+              sudo curl -fSL \
+                "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${COMPOSE_ARCH}" \
+                -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+            fi
+
+            echo "Verifying Docker installation..."
+            sudo docker --version
+            sudo docker compose version
+
+            echo "Checking deployment directory..."
             cd ~/final-project
-            docker compose up -d --build
+
+            echo "Building and deploying applications..."
+            sudo docker compose up -d --build
+
+            echo "Checking running containers..."
+            sudo docker compose ps
