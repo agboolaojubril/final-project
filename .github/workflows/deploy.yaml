@@ -102,23 +102,15 @@ jobs:
                 ;;
             esac
 
+            BUILDX_VERSION="v0.37.2"
+            BUILDX_URL="https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${BUILDX_ARCH}"
+
             sudo mkdir -p /usr/local/lib/docker/cli-plugins
 
-            sudo curl -fSL \
-              "https://github.com/docker/buildx/releases/latest/download/buildx-linux-${BUILDX_ARCH}" \
+            sudo curl -fSL "$BUILDX_URL" \
               -o /usr/local/lib/docker/cli-plugins/docker-buildx
 
             sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
-            echo "Verifying Docker Buildx..."
+            echo "Verifying Buildx..."
             sudo docker buildx version
-
-            echo "Verifying Docker Compose..."
-            sudo docker compose version
-
-            echo "Building and deploying applications..."
-            cd ~/final-project
-            sudo docker compose up -d --build
-
-            echo "Checking running containers..."
-            sudo docker compose ps
