@@ -90,10 +90,34 @@ jobs:
             sudo docker --version
             sudo docker compose version
 
-            echo "Checking deployment directory..."
-            cd ~/final-project
+            echo "Installing Docker Buildx..."
+
+            ARCH=$(uname -m)
+            case "$ARCH" in
+              x86_64) BUILDX_ARCH=amd64 ;;
+              aarch64) BUILDX_ARCH=arm64 ;;
+              *)
+                echo "Unsupported architecture: $ARCH"
+                exit 1
+                ;;
+            esac
+
+            sudo mkdir -p /usr/local/lib/docker/cli-plugins
+
+            sudo curl -fSL \
+              "https://github.com/docker/buildx/releases/latest/download/buildx-linux-${BUILDX_ARCH}" \
+              -o /usr/local/lib/docker/cli-plugins/docker-buildx
+
+            sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+
+            echo "Verifying Docker Buildx..."
+            sudo docker buildx version
+
+            echo "Verifying Docker Compose..."
+            sudo docker compose version
 
             echo "Building and deploying applications..."
+            cd ~/final-project
             sudo docker compose up -d --build
 
             echo "Checking running containers..."
