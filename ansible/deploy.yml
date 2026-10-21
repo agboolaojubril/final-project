@@ -1,0 +1,128 @@
+---
+- name: Configure EC2 and deploy applications
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    app_dir: /opt/final-project
+    buildx_version: v0.17.1
+    compose_version: v2.32.4
+
+  tasks:
+    - name: Verify Amazon Linux 2023
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Amazon"
+          - ansible_distribution_major_version == "2023"
+        fail_msg: "This playbook expects Amazon Linux 2023."
+
+    - name: Install Docker and required utilities
+      ansible.builtin.dnf:
+        name:
+          - docker
+          - curl
+        state: present
+
+    - name: Start and enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create Docker CLI plugin directory
+      ansible.builtin.file:
+        path: /usr/local/lib/docker/cli-plugins
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Determine download architecture
+      ansible.builtin.set_fact:
+        download_arch: >-
+          {{ 'amd64' if ansible_architecture == 'x86_64'
+             else 'arm64' if ansible_architecture == 'aarch64'
+             else 'unsupported' }}
+
+    - name: Validate server architecture
+      ansible.builtin.assert:
+        that:
+          - download_arch != "unsupported"
+        fail_msg: "Unsupported EC2 architecture: {{ ansible_architecture }}"
+
+    - name: Install Docker Buildx
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/buildx/releases/download/{{ buildx_version }}/buildx-{{ buildx_version }}.linux-{{ download_arch }}"
+        dest: /usr/local/lib/docker/cli-plugins/docker-buildx
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install Docker Compose
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-linux-{{ 'x86_64' if download_arch == 'amd64' else 'aarch64' }}"
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Verify Docker installation
+      ansible.builtin.command: docker --version
+      changed_when: false
+
+    - name: Verify Buildx installation
+      ansible.builtin.command: docker buildx version
+      changed_when: false
+
+    - name: Verify Compose installation
+      ansible.builtin.command: docker compose version
+      changed_when: false
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../docker-compose.yml"
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy portfolio application
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../myportfolio-main/"
+        dest: "{{ app_dir }}/myportfolio-main/"
+        owner: root
+        group: root
+
+    - name: Copy Java application
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../project-java-app/"
+        dest: "{{ app_dir }}/project-java-app/"
+        owner: root
+        group: root
+
+    - name: Build and deploy applications
+      ansible.builtin.command:
+        cmd: docker compose up -d --build
+        chdir: "{{ app_dir }}"
+      register: compose_deploy
+      changed_when: true
+
+    - name: Display running containers
+      ansible.builtin.command:
+        cmd: docker compose ps
+        chdir: "{{ app_dir }}"
+      register: compose_status
+      changed_when: false
+
+    - name: Show deployment status
+      ansible.builtin.debug:
+        var: compose_status.stdout_lines

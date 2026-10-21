@@ -4,120 +4,53 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to EC2
+    name: Configure EC2 and Deploy with Ansible
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v6
 
-      # 2. Copy the project to EC2
-      - name: Copy project to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          source: "."
-          target: "~/final-project"
+      # 2. Install Ansible on the GitHub Actions runner
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
 
-      # 3. Install Docker and Docker Compose, then deploy
-      - name: Install Docker and Docker Compose and deploy
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          command_timeout: 30m
-          script: |
-            set -e
+      # 3. Configure SSH access
+      - name: Configure SSH
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          set -e
 
-            echo "Detecting Amazon Linux version..."
-            source /etc/os-release
-            echo "OS: $PRETTY_NAME"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-            echo "Installing Docker..."
-            if [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2023" ]; then
-              sudo dnf install -y docker
-            elif [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2" ]; then
-              sudo yum install -y docker
-            else
-              echo "Unsupported OS: $ID $VERSION_ID"
-              exit 1
-            fi
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
 
-            echo "Starting Docker..."
-            sudo systemctl enable --now docker
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-            echo "Checking Docker Compose..."
-            if ! sudo docker compose version >/dev/null 2>&1; then
-              if [ "$ID" = "amzn" ] && [ "$VERSION_ID" = "2023" ]; then
-                sudo dnf install -y docker-compose-plugin || true
-              fi
-            fi
+      # 4. Configure EC2 and deploy applications using Ansible
+      - name: Configure EC2 and deploy applications
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          set -e
 
-            if ! sudo docker compose version >/dev/null 2>&1; then
-              echo "Installing Docker Compose CLI plugin..."
-              ARCH=$(uname -m)
+          ansible --version
 
-              case "$ARCH" in
-                x86_64) COMPOSE_ARCH=x86_64 ;;
-                aarch64) COMPOSE_ARCH=aarch64 ;;
-                *)
-                  echo "Unsupported architecture: $ARCH"
-                  exit 1
-                  ;;
-              esac
-
-              sudo mkdir -p /usr/local/lib/docker/cli-plugins
-
-              sudo curl -fSL \
-                "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${COMPOSE_ARCH}" \
-                -o /usr/local/lib/docker/cli-plugins/docker-compose
-
-              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-            fi
-
-            echo "Verifying Docker installation..."
-            sudo docker --version
-            sudo docker compose version
-
-            echo "Installing Docker Buildx..."
-
-            ARCH=$(uname -m)
-            case "$ARCH" in
-              x86_64) BUILDX_ARCH=amd64 ;;
-              aarch64) BUILDX_ARCH=arm64 ;;
-              *)
-                echo "Unsupported architecture: $ARCH"
-                exit 1
-                ;;
-            esac
-
-            BUILDX_VERSION="v0.37.2"
-            BUILDX_URL="https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${BUILDX_ARCH}"
-
-            sudo mkdir -p /usr/local/lib/docker/cli-plugins
-
-            sudo curl -fSL "$BUILDX_URL" \
-              -o /usr/local/lib/docker/cli-plugins/docker-buildx
-
-            sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
-
-            echo "Verifying Buildx..."
-            sudo docker buildx version
-
-            echo "Building and deploying applications..."
-            cd ~/final-project
-            sudo docker compose up -d --build
-
-            echo "Checking running containers..."
-            sudo docker compose ps
+          ansible-playbook \
+            -i "${EC2_HOST}," \
+            -u "$EC2_USER" \
+            --private-key "$HOME/.ssh/ec2_key" \
+            ansible/deploy.yml
