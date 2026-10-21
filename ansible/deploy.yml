@@ -1,3 +1,4 @@
+
 ---
 - name: Configure EC2 and deploy applications
   hosts: all
@@ -11,16 +12,16 @@
 
   tasks:
     - name: Verify Amazon Linux 2023
-  ansible.builtin.assert:
-    that:
-      - ansible_facts["distribution"] == "Amazon"
-      - ansible_facts["distribution_major_version"] == "2023"
-    fail_msg: "This playbook expects Amazon Linux 2023."
+      ansible.builtin.assert:
+        that:
+          - ansible_facts["distribution"] == "Amazon"
+          - ansible_facts["distribution_major_version"] == "2023"
+        fail_msg: "This playbook expects Amazon Linux 2023."
 
     - name: Install Docker
-  ansible.builtin.dnf:
-    name: docker
-    state: present
+      ansible.builtin.dnf:
+        name: docker
+        state: present
 
     - name: Start and enable Docker
       ansible.builtin.systemd:
@@ -66,15 +67,18 @@
         mode: "0755"
 
     - name: Verify Docker installation
-      ansible.builtin.command: docker --version
+      ansible.builtin.command:
+        cmd: docker --version
       changed_when: false
 
-    - name: Verify Buildx installation
-      ansible.builtin.command: docker buildx version
+    - name: Verify Docker Buildx installation
+      ansible.builtin.command:
+        cmd: docker buildx version
       changed_when: false
 
-    - name: Verify Compose installation
-      ansible.builtin.command: docker compose version
+    - name: Verify Docker Compose installation
+      ansible.builtin.command:
+        cmd: docker compose version
       changed_when: false
 
     - name: Create application directory
@@ -106,6 +110,12 @@
         dest: "{{ app_dir }}/project-java-app/"
         owner: root
         group: root
+
+    - name: Validate Docker Compose configuration
+      ansible.builtin.command:
+        cmd: docker compose config --quiet
+        chdir: "{{ app_dir }}"
+      changed_when: false
 
     - name: Build and deploy applications
       ansible.builtin.command:
