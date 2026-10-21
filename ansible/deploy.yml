@@ -11,18 +11,16 @@
 
   tasks:
     - name: Verify Amazon Linux 2023
-      ansible.builtin.assert:
-        that:
-          - ansible_distribution == "Amazon"
-          - ansible_distribution_major_version == "2023"
-        fail_msg: "This playbook expects Amazon Linux 2023."
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Amazon"
+      - ansible_facts["distribution_major_version"] == "2023"
+    fail_msg: "This playbook expects Amazon Linux 2023."
 
-    - name: Install Docker and required utilities
-      ansible.builtin.dnf:
-        name:
-          - docker
-          - curl
-        state: present
+    - name: Install Docker
+  ansible.builtin.dnf:
+    name: docker
+    state: present
 
     - name: Start and enable Docker
       ansible.builtin.systemd:
