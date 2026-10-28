@@ -23,19 +23,16 @@ jobs:
           sudo apt-get install -y ansible
 
       # 3. Configure SSH access
+      
       - name: Configure SSH
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          set -e
-
+          set -euo pipefail
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
           printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/ec2_key
           chmod 600 ~/.ssh/ec2_key
-
           ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
